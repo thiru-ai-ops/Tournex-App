@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="transport_modes_modern">
+        <item>🚌 Bus (Economy)</item>
+        <item>🚂 Train (Comfort)</item>
+        <item>🚗 Car/Taxi (Flexible)</item>
+        <item>✈️ Flight (Fast)</item>
+    </string-array>
+
+    <string-array name="transport_modes">
+        <item>Bus</item>
+        <item>Train</item>
+        <item>Car</item>
+        <item>Flight</item>
+    </string-array>
+</resources>
