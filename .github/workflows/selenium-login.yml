@@ -1,0 +1,60 @@
+name: Selenium E2E Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  selenium-tests:
+    name: Run Selenium E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json' # Caches npm packages to speed up builds
+
+      # Step 3: Install Frontend Dependencies
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      # Step 4: Install Selenium Test Dependencies
+      - name: Install Selenium Dependencies
+        working-directory: ./frontend/selenium-tests
+        run: npm ci
+
+      # Step 5: Start the React Frontend App in the Background
+      - name: Start React App
+        working-directory: ./frontend
+        run: |
+          # Build the production assets
+          npm run build
+          # Install a simple server to host the build locally
+          npm install -g serve
+          # Start serve on port 3000 in the background
+          serve -s build -l 3000 &
+
+      # Step 6: Wait for local server to be ready before testing
+      - name: Wait for server to start
+        run: |
+          # Use wait-on utility to block until port 3000 is listening
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      # Step 7: Run Selenium Tests (using Headless Chrome)
+      - name: Run Selenium Tests
+        working-directory: ./frontend/selenium-tests
+        env:
+          TEST_BASE_URL: http://localhost:3000
+        run: |
+          npm run login
